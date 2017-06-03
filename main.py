@@ -5,16 +5,16 @@ import sys
 
 epsilon = math.pow(10, -9)
 h = math.pow(10, -6)
-kMax = 10000
+k_max = 10000
 
 
-class Pair:
-    first = None
-    second = None
+class Pereche:
+    a = None
+    b = None
 
-    def __init__(self, pFirst, pSecond):
-        self.first = pFirst
-        self.second = pSecond
+    def __init__(self, a, b):
+        self.a = a
+        self.b = b
 
 
 def main():
@@ -24,225 +24,225 @@ def main():
 
 def pb1():
     p = list()
-    parametriPolinom = open('polinom.txt', "rt").read().split(";")
+    parametri_polinom = open('polinom.txt', "rt").read().split(";")
 
-    coefficients = list()
-    for t in range(len(parametriPolinom) - 1, -1, -1):
-        coefficients.append(float(parametriPolinom[t]))
+    coeficienti = list()
+    for t in range(len(parametri_polinom) - 1, -1, -1):
+        coeficienti.append(float(parametri_polinom[t]))
 
-    R = (abs(coefficients[len(coefficients) - 1]) + max(coefficients)) / abs(coefficients[len(coefficients) - 1])
+    R = (abs(coeficienti[len(coeficienti) - 1]) + max(coeficienti)) / abs(coeficienti[len(coeficienti) - 1])
 
-    print("Intervalul in care se gasesc radacinile polinomului este  [" + str(-R) + "," + str(R) + "]")
-    print("Se aplica metoda lui Laguerre ...")
+    print("Interval radacini: [" + str(-R) + "," + str(R) + "]")
+    print("Metoda lui Laguerre: ")
 
     p = list()
-    for i in range(0, len(coefficients)):
-        p.append(complex(coefficients[i]))
-    print(p)
+    for i in range(0, len(coeficienti)):
+        # print(coeficienti[i], sep=', ')
+        p.append(complex(coeficienti[i]))
+    # print(p)
 
-    roots = find_roots(p, R)
-    print(roots)
-    size_roots = len(roots)
-    unique_roots = list()
+    radacini = gaseste_radacini(p, R)
+    # print(roots)
+    size_radacini = len(radacini)
+    radacini_unice = list()
 
-    for i in range(0, size_roots):
-        if (abs(roots[i].real) < epsilon):
-            roots[i] = roots[i] - complex(roots[i].real, 0)
-        if (abs(roots[i].imag) < epsilon):
-            roots[i] = roots[i] - complex(0, roots[i].imag)
-        roots.append(complex(roots[i].real, -roots[i].imag))
+    for i in range(0, size_radacini):
+        if (abs(radacini[i].real) < epsilon):
+            radacini[i] = radacini[i] - complex(radacini[i].real, 0)
+        if (abs(radacini[i].imag) < epsilon):
+            radacini[i] = radacini[i] - complex(0, radacini[i].imag)
+        radacini.append(complex(radacini[i].real, -radacini[i].imag))
 
-    roots.sort(key=lambda x: x.real)
-    unique_roots.append(roots[0])
+    radacini.sort(key=lambda x: x.real)
+    radacini_unice.append(radacini[0])
 
-    for i in range(1, len(roots)):
-        alreadyExists = False
-        for contor in range(0, len(unique_roots)):
-            if (abs(unique_roots[contor].real - roots[i].real) <= epsilon) and (
-                        abs(unique_roots[contor].imag - roots[i].imag) <= epsilon):
-                alreadyExists = True
+    for i in range(1, len(radacini)):
+        already_exists = False
+        for ii in range(0, len(radacini_unice)):
+            if (abs(radacini_unice[ii].real - radacini[i].real) <= epsilon) and (
+                        abs(radacini_unice[ii].imag - radacini[i].imag) <= epsilon):
+                already_exists = True
                 break
-        if alreadyExists == False:
-            unique_roots.append(roots[i])
+        if already_exists == False:
+            radacini_unice.append(radacini[i])
 
     print("")
 
-    polinoameFile = open('radacini.txt', "wt")
+    fisier_radacini = open('radacini.txt', "wt")
 
     print("Radacinile sunt: ")
-    for i in range(0, len(unique_roots)):
-        print(str(unique_roots[i].real) + " , " + str(unique_roots[i].imag) + "i")
-        polinoameFile.write(str(unique_roots[i].real) + " , " + str(unique_roots[i].imag) + "i" + "\n")
+    for i in range(0, len(radacini_unice)):
+        print(str(radacini_unice[i].real) + ", " + str(radacini_unice[i].imag) + "i")
+        fisier_radacini.write(str(radacini_unice[i].real) + ", " + str(radacini_unice[i].imag) + "i" + "\n")
 
 
 def pb2():
-    parametriPolinom = open('polinom.txt', "rt").read().split(";")
+    parametri_polinom = open('polinom.txt', "rt").read().split(";")
     p = list()
-    for t in range(0, len(parametriPolinom)):
-        p.append(float(parametriPolinom[t]))
+    for t in range(0, len(parametri_polinom)):
+        p.append(float(parametri_polinom[t]))
 
     R = (abs(p[0]) + max(p)) / abs(p[0])
 
     solutii1 = list()
-    solutiiUnice1 = list()
+    solutii_unice1 = list()
 
     print("")
     print("Formula de aproximare G1")
 
-    for countIncercari1 in range(0, 5):
-        xPrec = random.randint(-int(R), int(R))
-        x = xPrec + 1
+    for count_incercari1 in range(0, 5):
+        x_prec = random.randint(-int(R), int(R))
+        x = x_prec + 1
         k = 0
 
         while True:
-            FdeXderivat = calculateDerivataG1(p, x)
-            FdeXprecDerivat = calculateDerivataG1(p, xPrec)
-            numitorDeltaX = (FdeXderivat - FdeXprecDerivat)
-            if numitorDeltaX >= -epsilon and numitorDeltaX <= epsilon:
-                deltaX = math.pow(10, -5)
+            fx_derivat = calculeaza_derivata_G1(p, x)
+            fx_prec_derivat = calculeaza_derivata_G1(p, x_prec)
+            numitor_delta_x = (fx_derivat - fx_prec_derivat)
+            if numitor_delta_x >= -epsilon and numitor_delta_x <= epsilon:
+                delta_x = math.pow(10, -5)
             else:
-                deltaX = ((x - xPrec) * FdeXderivat) / numitorDeltaX
-            xPrec = x
-            x = x - deltaX
+                delta_x = ((x - x_prec) * fx_derivat) / numitor_delta_x
+            x_prec = x
+            x = x - delta_x
             k = k + 1
-            if abs(deltaX) < epsilon or k > kMax or abs(deltaX) > math.pow(10, 8):
+            if abs(delta_x) < epsilon or k > k_max or abs(delta_x) > math.pow(10, 8):
                 break
-        if abs(deltaX) < epsilon:
+        if abs(delta_x) < epsilon:
             solutii1.append(x)
-            if len(solutiiUnice1) == 0:
-                solutiiUnice1.append(x)
+            if len(solutii_unice1) == 0:
+                solutii_unice1.append(x)
             else:
-                alreadyExists = False
-                for contor in range(0, len(solutiiUnice1)):
-                    if (abs(solutiiUnice1[contor] - x) <= epsilon):
-                        alreadyExists = True
+                already_exists = False
+                for contor in range(0, len(solutii_unice1)):
+                    if (abs(solutii_unice1[contor] - x) <= epsilon):
+                        already_exists = True
                         break
-                if alreadyExists == False:
-                    solutiiUnice1.append(x)
+                if already_exists == False:
+                    solutii_unice1.append(x)
         else:
             print("divergenta")
-            countIncercari1 = countIncercari1 - 1
+            count_incercari1 = count_incercari1 - 1
 
-    for r in range(0, len(solutiiUnice1)):
-        derivataSecunda = calculateDerivateSecunda(p, solutiiUnice1[r])
-        if derivataSecunda > 0:
-            print("Punctul critic " + str(solutiiUnice1[r]) + " este punct de minim")
+    for s in range(0, len(solutii_unice1)):
+        derivata_secunda = calculeaza_derivata_secunda(p, solutii_unice1[s])
+        if derivata_secunda > 0:
+            print("Punctul critic " + str(solutii_unice1[s]) + " este punct de minim")
         else:
-            print("Punctul critic " + str(solutiiUnice1[r]) + " NU este punct de minim")
+            print("Punctul critic " + str(solutii_unice1[s]) + " NU este punct de minim")
 
     solutii2 = list()
-    solutiiUnice2 = list()
+    solutii_unice2 = list()
 
     print("")
     print("Formula de aproximare G2")
 
-    countIncercari2 = 0
+    count_incercari2 = 0
     counter = 0
-    while countIncercari2 < 5:
-
-        xPrec = random.randint(-int(R), int(R))
+    while count_incercari2 < 5:
+        x_prec = random.randint(-int(R), int(R))
         while True:
             x = random.randint(-int(R), int(R))
-            if abs(x - xPrec) >= epsilon:
+            if abs(x - x_prec) >= epsilon:
                 break
         k = 0
 
         while True:
-            FdeXderivat = calculateDerivataG2(p, x)
-            FdeXprecDerivat = calculateDerivataG2(p, xPrec)
-            numitorDeltaX = (FdeXderivat - FdeXprecDerivat)
-            if numitorDeltaX >= -epsilon and numitorDeltaX <= epsilon:
-                deltaX = math.pow(10, -5)
+            fx_derivat = calculeaza_derivata_g2(p, x)
+            fx_prec_derivat = calculeaza_derivata_g2(p, x_prec)
+            numitor_delta_x = (fx_derivat - fx_prec_derivat)
+            if numitor_delta_x >= -epsilon and numitor_delta_x <= epsilon:
+                delta_x = math.pow(10, -5)
             else:
-                deltaX = ((x - xPrec) * FdeXderivat) / numitorDeltaX
+                delta_x = ((x - x_prec) * fx_derivat) / numitor_delta_x
 
-            xPrec = x
-            x = x - deltaX
+            x_prec = x
+            x = x - delta_x
             k = k + 1
-            if abs(deltaX) < epsilon or k > kMax or abs(deltaX) > math.pow(10, 8):
+            if abs(delta_x) < epsilon or k > k_max or abs(delta_x) > math.pow(10, 8):
                 break
-        if abs(deltaX) < epsilon:
+        if abs(delta_x) < epsilon:
             solutii2.append(x)
-            if len(solutiiUnice2) == 0:
-                solutiiUnice2.append(x)
+            if len(solutii_unice2) == 0:
+                solutii_unice2.append(x)
             else:
-                alreadyExists = False
-                for contor in range(0, len(solutiiUnice2)):
-                    if (abs(solutiiUnice2[contor] - x) <= epsilon):
-                        alreadyExists = True
+                already_exists = False
+                for contor in range(0, len(solutii_unice2)):
+                    if (abs(solutii_unice2[contor] - x) <= epsilon):
+                        already_exists = True
                         break
-                if alreadyExists == False:
-                    solutiiUnice2.append(x)
+                if already_exists == False:
+                    solutii_unice2.append(x)
         else:
-            countIncercari2 = countIncercari2 - 1
+            count_incercari2 = count_incercari2 - 1
 
-        countIncercari2 = countIncercari2 + 1
+        count_incercari2 = count_incercari2 + 1
         counter = counter + 1
         if counter >= 50:
             print("Divergenta")
             break
 
-    for r in range(0, len(solutiiUnice2)):
-        derivataSecunda = calculateDerivateSecunda(p, solutiiUnice2[r])
-        if derivataSecunda > 0:
-            print("Punctul critic " + str(solutiiUnice2[r]) + " este punct de minim")
+    for s in range(0, len(solutii_unice2)):
+        derivata_secunda = calculeaza_derivata_secunda(p, solutii_unice2[s])
+        if derivata_secunda > 0:
+            print("Punctul critic " + str(solutii_unice2[s]) + " este punct de minim")
         else:
-            print("Punctul critic " + str(solutiiUnice2[r]) + " NU este punct de minim")
+            print("Punctul critic " + str(solutii_unice2[s]) + " NU este punct de minim")
 
 
-def find_roots(p, R):
+def gaseste_radacini(p, R):
     q = p
     w = q[:]
 
-    res = list()
+    rez = list()
     for i in range(0, 10):
         q = w[:]
         while len(q) > 2:
             z = complex(random.randint(-int(R), int(R)), random.randint(-int(R), int(R)))
-            z = find_a_root(q, z)
-            z = find_a_root(p, z)
-            q = horner(q, z).first
+            z = gaseste_radacina(q, z)
+            z = gaseste_radacina(p, z)
+            q = horner(q, z).a
             q.pop()
-            res.append(z)
-        res.append(-q[0] / q[1])
-    return res
+            rez.append(z)
+        rez.append(-q[0] / q[1])
+    return rez
 
 
-def find_a_root(p0, x):
+def gaseste_radacina(p0, x):
     n = len(p0) - 1
-    p1 = derivare(p0)
-    p2 = derivare(p1)
+    p1 = deriveaza(p0)
+    p2 = deriveaza(p1)
     for step in range(0, 10000):
         y0 = eval(p0, x)
-        if compare(y0, 0) == 0:
+        if compara(y0, 0) == 0:
             break
         G = eval(p1, x) / y0
         H = G * G - eval(p2, x) - y0
         R = cmath.sqrt(complex(n - 1) * (H * complex(n) - G * G))
         D1 = G + R
         D2 = G - R
-        if (compare(D1, D2)) > 0:
+        if (compara(D1, D2)) > 0:
             toDivide = D1
         else:
             toDivide = D2
         a = complex(n) / toDivide
         x = x - a
-        if (compare(a, 0) == 0):
+        if (compara(a, 0) == 0):
             break
 
     return x
 
 
-def derivare(p):
+def deriveaza(p):
     n = len(p)
-    r = list()
+    rez = list()
     for i in range(1, n):
-        r.append(p[i] * complex(i))
-    return r
+        rez.append(p[i] * complex(i))
+    return rez
 
 
 def eval(p, x):
-    return horner(p, x).second;
+    return horner(p, x).b;
 
 
 def horner(a, x0):
@@ -250,15 +250,15 @@ def horner(a, x0):
     b = [0] * n
 
     for i in range(n - 1, 0, -1):
-        toAdd = 0
+        to_add = 0
         if i < (n - 1):
-            toAdd = b[i] * x0
-        b[i - 1] = a[i] + toAdd
+            to_add = b[i] * x0
+        b[i - 1] = a[i] + to_add
 
-    return Pair(b, a[0] + b[0] * x0)
+    return Pereche(b, a[0] + b[0] * x0)
 
 
-def compare(x, y):
+def compara(x, y):
     diff = abs(x) - abs(y)
     if diff < -epsilon:
         return -1
@@ -269,41 +269,41 @@ def compare(x, y):
             return 0
 
 
-def getListDerivare(a):
-    derivative = [0] * (len(a) - 1)
-    for i in range(0, len(derivative)):
-        derivative[i] = a[i] * (a.length - 1 - i);
-    return derivative
+def get_lista_derivare(a):
+    lista_derivare = [0] * (len(a) - 1)
+    for i in range(0, len(lista_derivare)):
+        lista_derivare[i] = a[i] * (a.length - 1 - i);
+    return lista_derivare
 
 
-def calculatePolynomialHorner(a, x):
+def calculeaza_horner_polinomial(a, x):
     b = a[0];
     for i in range(1, len(a)):
         b = a[i] + b * x;
     return b
 
 
-def calculateDerivataG1(a, x):
-    F1 = calculatePolynomialHorner(a, x)
-    F2 = calculatePolynomialHorner(a, x - h)
-    F3 = calculatePolynomialHorner(a, x - 2 * h)
+def calculeaza_derivata_G1(a, x):
+    F1 = calculeaza_horner_polinomial(a, x)
+    F2 = calculeaza_horner_polinomial(a, x - h)
+    F3 = calculeaza_horner_polinomial(a, x - 2 * h)
     return (3 * F1 - 4 * F2 + F3) / h
 
 
-def calculateDerivataG2(a, x):
-    F1 = calculatePolynomialHorner(a, x + 2 * h)
-    F2 = calculatePolynomialHorner(a, x + h)
-    F3 = calculatePolynomialHorner(a, x - h)
-    F4 = calculatePolynomialHorner(a, x - 2 * h)
+def calculeaza_derivata_g2(a, x):
+    F1 = calculeaza_horner_polinomial(a, x + 2 * h)
+    F2 = calculeaza_horner_polinomial(a, x + h)
+    F3 = calculeaza_horner_polinomial(a, x - h)
+    F4 = calculeaza_horner_polinomial(a, x - 2 * h)
     return (-F1 + 8 * F2 - 8 * F3 + F4) / 12 * h
 
 
-def calculateDerivateSecunda(a, x):
-    F1 = calculatePolynomialHorner(a, x + 2 * h)
-    F2 = calculatePolynomialHorner(a, x + h)
-    F3 = calculatePolynomialHorner(a, x)
-    F4 = calculatePolynomialHorner(a, x - h)
-    F5 = calculatePolynomialHorner(a, x - 2 * h)
+def calculeaza_derivata_secunda(a, x):
+    F1 = calculeaza_horner_polinomial(a, x + 2 * h)
+    F2 = calculeaza_horner_polinomial(a, x + h)
+    F3 = calculeaza_horner_polinomial(a, x)
+    F4 = calculeaza_horner_polinomial(a, x - h)
+    F5 = calculeaza_horner_polinomial(a, x - 2 * h)
     return (-F1 + 16 * F2 - 30 * F3 + 16 * F4 - F5) / 12 * h * h
 
 
